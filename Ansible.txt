@@ -1,0 +1,220 @@
+The technique of making a process, or a system operate automatically,
+
+What is Ansible?
+~ Ansible is a radically simple IT automation engine that automates cloud provisioning, configuration
+management, application deployment, intra-service orchestration, and many other it needs.
+
+~ Ansible is open source and provided by the Red Hat.
+~ Developed by Michael DeHaan.
+~ oct 2015 aquired by the Red Hat.
+
+Ansible used not only for application deployment
+~ INFRASTRUCTURE
+~ NETWORK
+~ CONTAINERS
+~ SECURITY
+~ CLOUD
+
+PHYSICAL DEVICES easily manage various physical devices
+VIRTUALIZATION  Ansible supports all the leading virtualization platform - VMware,RH,Vagrant
+OPERATING SYSTEM Ansible supports all the widely operating system. Linux, RHEL, CentOS, Windows.
+
+Automation your network
+
+With ansible you can automate networks at ease:
+~Reduce complexity of long, detailed, and complex methods of procedures
+~Test and validate existing network state.
+Continuous complliance.
+
+
+
+
+Network Automation with RedHat Ansible Automation Platform
+~Benefit from Ansible Tower:
+--Security:Store Network Credentials
+--Delegation:Using Role-Based Access Control (RBAC)
+--Power:Leverage the Ansible Tower API
+--Control:Schedule jobs for Automated Playbook Runs
+--Flexibility:Launch Job Template Using Surveys
+--Intergrations:Leverage Ansible Tower Intergration like Version Control
+--Compliance:Run Jobs in Check Mode for Audits
+
+
+Why Ansible?
+
+--Automate
+--Accelerate
+--Collaborate	
+--Integrate
+
+
+SSH For unix based machines
+Remote power shell for Windows machines
+
+In real world scenerio we work with more than 2 or more instance,we cant sit n type each command and wait to happen
+for example we have 4 servers, 2 for web server and 2 for Database
+to keep a track of the instances in devops we maintain a inventory file
+so inventory file we have maintain a track of all target machines, ip address, username, connection type, passwords/sshkeys
+and execute as per our need
+
+example INVENTORY FILE PATH:/etc/ansible/hosts/inventory.yml
+
+[webservers]  -- defination
+targeta.hello.com
+targetd.hello.com
+
+[dbservers]
+targetc.hello.com
+targetf.hello.com
+
+[common]
+targeta.hello.com
+targetd.hello.com
+targetc.hello.com
+targetf.hello.com
+ 
+RUN WEB SERVER : ansible webservers -m ping -i inventory.txt
+RUN DB SERVER  : ansible dbservers  -m ping -i inventory.txt
+RUN COMMON     : ansible common -m ping -i inventory.txt
+
+Inventory.txt
+[webservers]
+~ ansible-target-1 ansible_host = 3.110.172.127 ansible_connection = ssh ansible_user = ec2-user
+~ ansible-target-2 ansible_host = 13.233.86.238 ansible_connection = ssh ansible_user = ec2-user
+
+/etc/ansible/anisble.cfg
+
+
+YAML 
+raw_materials:
+-coffee
+-flavour liquid
+-milk                        <=list
+-water
+-sugar
+-cream
+
+grinding:
+ coffee:peets                <=dictonary
+ texture:coarse
+
+raw_materials:
+- coffee
+- flavour liquid
+- milk                        <=list
+- water
+- sugar
+- cream
+grinding:
+  coffee:peets                <=dictonary
+  texture:coarse
+
+
+
+Ingredients:
+- coffe
+- flavour liquid
+- Milk:                     <= nested list
+  - dominos
+  - low fat
+  - toned
+
+MULTIPLE LINE STATEMENT IN YAML
+
+literal block scaler
+Process: |
+ lines                       <= new lines
+ lines                
+ lines
+
+folded block scaler
+Process: >
+ lines
+ lines                       <== no new lines
+ lines
+
+Expression in yml
+file_path:"{{variable}}"  value will be replaced at run time
+
+
+''  => doesnt accept special character/escape character as a string. 	
+""  => accepts the special characters/ escape character as a string. 
+
+
+MODULES :-
+also referred to as "task plugins" or "library plugins" are discrete units of code that can be used from cmd or in
+a playbook task.
+~ exectues each module on the remote target node
+~ collects return values
+
+
+ansible <pattern_goes_here> -m <modul_name> -a <arguments>
+ansible webservers -m service -a "name=httpd state=restarted"
+
+arguments
+~ most modules take key=values arguments, space delimited
+~ some modules take no arguments
+~ command/shell modules simply take the string of the command you want to run
+
+conversion from cli to yaml
+
+CLI
+ansible webservers -m service -a "name=httpd state=restarted"
+
+YAML
+-name:restart webserver
+ service:
+   name:httpd
+   state:restarted
+
+ansible webservers -m command -a "/sbin/reboot -t now"
+
+-name:reboot the servers
+ action:command /sbin/reboot -t now
+ 
+-name:reboot the servers
+ command:/sbin/reboot -t now
+
+
+
+Example
+commands modules
+- COMMAND - The command module takes the command name folled by a list of space-delimited arguments, the give command
+            will be executed on all selected nodes.
+
+- EXPECT  - The expect module execute a command and responds to prompts. given command will execute on the selected nodes
+
+- PEXEC   - Runs a remote command from a Linux host to a Windows host without WinRM being setup.
+	 can be run on the ansible controller to bootstrap windows hosts to get them ready for WinRM
+
+- RAW  - Executes a low-down and dirty ssh command, not going through the module subsystem
+
+- SCRIPT -  The local acript at apth will be transferred to the remote node and the executed.
+            the given script will eb processed through the shell enviroment ont the remote node
+
+- SHELL - It is the almost exactly like the command modules but runs the command through a shell(/bin/sh) on the
+           remote node. for Windows targets use the win_shell module instead
+
+- TELNET - Execute a low-down and dirty telnet command. not going through the module subsystem.
+           This is mostly to be used for enabling shh on devices that only have telnet enabled by default.
+
+
+
+
+EXECUTION PLAYBOOK
+
+- name: Setup nginx server on my-server list(host group)    => Name String
+  hosts: my-servers                                         => Host Group/Pattern
+  become: True                                              => Elevating Privileages
+  tasks: 
+    - name: Install the latest version of nginx
+      command: amazon-linux-extras install nginx{{ nginx_version }}=latest -y  => Ansible module
+      args:                                                                    => Task Keyword  
+        creates: /sibn/nginx
+
+
+
+
+
+
+

@@ -1,0 +1,36 @@
+//to install Ansible in Linux 
+~ sudo amazon-linux-extras install ansible2
+
+//checking version
+ansible --version
+
+then create a pem file and add the ssh private key to that file
+
+then create inventory to keep a track of target details
+
+//The SSH agent ( ssh-agent ) is an SSH key manager that stores the SSH key in a process memory 
+so that users can log into SSH servers without having to type the key's passphrase every time they authenticate with the server
+~ ssh-agent bash
+
+~ cp Ansible.pem ~/.ssh/
+
+//ssh-add adds private key identities (from your ~/. ssh directory) to the authentication agent 
+( ssh-agent ), so that the ssh agent can take care of the authentication for you, and you don't 
+have type in passwords at the terminal
+
+~ ssh-add ~/.ssh/Ansible.pem
+
+if gives Warning UNPROTECTED PRIVATE KEY FILE!
+
+run
+//600 permissions means that only the owner of the file has full read and write access to it. Once a file permission is set to 600, no one else can access the file
+~ chmod 600 ~/.ssh/Ansible.pem
+
+755 means read and execute access for everyone and also write access for the owner of the file
+~ chmod 755 ~/.ssh/
+
+//to disable hostkey verification, uncomment the host-key=false
+~ sudo vim /etc/ansible/ansible.cfg
+
+
+

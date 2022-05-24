@@ -1,0 +1,148 @@
+Ansible uses variables to manage differences between systems. With Ansible, you can execute tasks and playbooks
+on multiple differnet systems with a single command.
+you can define these variable in your playbook, in your inventory, in re-usable files or roles, or at the command line
+
+
+example
+- foo
+- foo_env
+- foo_port
+- foo5,_foo
+
+# Valid variable names only include
+
+- letters, numbers, underscores,
+- python keywords or paybook keywords are not valid variable name
+- can begin with a number
+- can begin with a underscore.
+
+# Defining the Ansible Variable
+ 
+- src:'{{install_path}}/inventory.cfg'  => valid    {{install_path}} jinga2 template expression
+-      {{install_path}}/inventory.cfg   => invalid  ERROR! Syntax Error while loading YAML.
+-     "{{install_path}}/22"             => valid 
+
+
+# Using a list of values in the variable
+
+aws_region:
+ -ap-south-1              => region:"{{aws_region[0}}"
+ -us-west-2
+ -us-east-1
+
+# Using a key value pair as a variables
+
+aws_region:
+  ap-south-1:John
+  us-west-2:Jesse          => region:"{{aws_region[ap-south-1]}}"  or "{{aws_region.ap-south-1}}"
+  us-east-1:David
+
+# Registering Ansible Variables from the output of an Ansible task with the task keyword register
+
+- hosts: web_servers
+  tasks: 
+       - name: Run a shell command and fetch the nginx version
+         shell: nginx -v
+         register: nginx_version
+
+       - name: Print the version of Nginx
+         debug:
+            msg: "The Current version of ansible is {{nginx_version}}"
+
+
+# Creating your variable file
+
+//  vars/my_varibale.yml
+
+ap_south_1: John
+us_west_2: Jesse
+us_east_1: David
+food:
+  - breakfast
+  - lunch
+  - dinner
+
+
+//This is your playbook
+
+- host: web_servers
+  vars:                         => for defining variables and values
+    myvar: hello_world
+  vars_file:                    => for accessing defined variables from the file. 
+    - /vars/my_variable.yml
+
+
+
+# Grouping and Host Variables
+- Assigning a variable to one machine: host variables
+- Assigning a variable to many machines: group variables
+
+ GROUP VARIABLES
+
+[webservers]
+ap1.pythoholic.com
+ap2.pythoholic.com
+eu1.pythoholic.com
+eu2.pythoholic.com
+
+[webservers]
+port_manager=3366
+proxy=proxy.pythoholic.com
+base_url=/etc/ansible/hosts
+
+
+ INHERITING GROUP VARIABLES
+
+[asia]
+ap1.pythoholic.com
+ap2.pythoholic.com
+
+[europe]
+eu1.pythoholic.com
+eu2.pythoholic.com
+
+[emea_region:vars]
+port_manager=3366
+proxy=proxy.pythoholic.com
+base_url=/etc/ansible/hosts
+
+[region:children]
+emea_region
+pacific_region
+aus_region
+
+
+  HOST VARIABLES
+
+VARIABLES
+
+[webservers]
+ap1.pythoholic.com
+ap2.pythoholic.com
+eu1.pyhtoholic.com
+eu2.pythoholic.com
+
+[webservers:vars]
+port_manager=3366
+proxy=proxy.pythoholic.com
+base_url=/etc/ansible/hosts
+
+
+[webservers]
+ap1.pythoholic.com port_manager=3366 proxy=proxy.pythoholic.com base_url=/etc/ansible/hosts
+ap2.pythoholic.com port_manager=3266 proxy=proxy.pythoholic.com base_url=/etc/ansible/hosts
+eu1.pythoholic.com port_manager=3466 proxy=proxy.pythoholic.com base_url=/etc/ansible/hosts
+eu2.pythoholic.com port_manager=3566 proxy=proxy.pythoholic.com base_url=/etc/ansible/hosts
+
+# Defining Variables at runtime
+- passing variables at the command line using the --extra-vars(or -e) argument
+- request user input with a vars_prompt
+
+KEY=VALUE 
+ ansible-playbook install_nginx.yml --extra-var "version=1.12.1 build=latest"
+
+JSON String Format
+ ansible-playbook install_nginx.yml --extra-vars '{"version":"1.12.1", "build":"latest"}'
+
+JSON or YAML file as a variable format
+ ansible-playbook install_nginx.yml --extra-var "@my_input_file.json"
